@@ -1,11 +1,13 @@
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
-from .models import Track, Favorite
+from .models import Track, Favorite, User
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.hashers import check_password
+from django.views.decorators.csrf import csrf_exempt
 import json
+import logging
 
 # Получение списка всех треков
-
 def get_tracks(request):
     tracks = Track.objects.order_by("id")
     data = list(tracks.values("id", "track", "artist"))
@@ -71,3 +73,75 @@ def get_favorites(request, user_id):
         for fav in favorites
     ]
     return JsonResponse(favorite_tracks, safe=False)
+
+# Регистрация нового пользователя
+def register(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            login = data.get("login")
+            password = data.get("password")
+            name = data.get("name", "")
+
+            if not login or not password:
+                return JsonResponse({"error": "Логин и пароль обязательны"}, status=400)
+
+            if User.objects.filter(login=login).exists():
+                return JsonResponse({"error": "Такой пользователь уже существует"}, status=400)
+
+            user = User.objects.create_user(login=login, password=password, name=name)
+            return JsonResponse({"message": "Пользователь успешно зарегистрирован"}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Неверный формат JSON"}, status=400)
+
+    return JsonResponse({"error": "Метод не поддерживается"}, status=405)
+
+# Вход пользователя
+def login(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            login_value = data.get("login")
+            password = data.get("password")
+
+            if not login_value or not password:
+                return JsonResponse({"error": "Логин и пароль обязательны"}, status=400)
+
+            # Ищем пользователя в БД
+            try:
+                user = User.objects.get(login=login_value)
+            except User.DoesNotExist:
+                return JsonResponse({"error": "Неверный логин или пароль"}, status=401)
+
+            # Проверяем пароль
+            if not check_password(password, user.password):  # <- проверяем хэшированный пароль
+                return JsonResponse({"error": "Неверный логин или пароль"}, status=401)
+
+            # Создаём сессию вручную
+            request.session["user_id"] = user.id
+            request.session["user_login"] = user.login
+
+            return JsonResponse({"message": "Успешный вход"}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Неверный формат JSON"}, status=400)
+
+    return JsonResponse({"error": "Метод не поддерживается"}, status=405)
+        
+
+logger = logging.getLogger(__name__)
+# Выход пользователя
+@csrf_exempt
+def logout(request):
+    if request.method == "POST":
+        try:
+            logout(request)  # Выход пользователя
+            response = JsonResponse({"message": "Вы вышли из системы"}, status=200)
+            response.delete_cookie("sessionid")  # Удаляем cookie сессии
+            return response
+        except Exception as e:
+            logger.error(f"Ошибка при выходе: {e}")
+            return JsonResponse({"error": "Ошибка на сервере"}, status=500)
+
+    return JsonResponse({"error": "Метод не поддерживается"}, status=405)
