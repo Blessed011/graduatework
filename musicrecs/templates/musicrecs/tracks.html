@@ -1,0 +1,41 @@
+{% extends 'musicrecs/base.html' %}
+
+{% block title %}Все треки{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Список всех треков</h2>
+
+<div class="row">
+    {% for track in tracks %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ track.track }}</h5>
+                <p class="card-text"><strong>Исполнитель:</strong> {{ track.artist }}</p>
+                <a href="{% url 'get_track_details' track.id %}" class="btn btn-primary">Подробнее</a>
+
+                {% if track.id in favorite_track_ids %}
+                <!-- Удалить из избранного -->
+                <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
+                    <input type="hidden" name="track_id" value="{{ track.id }}" />
+                    <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
+                </form>
+                {% else %}
+                <!-- Добавить в избранное -->
+                <form action="{% url 'add_to_favorites' %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
+                    <input type="hidden" name="track_id" value="{{ track.id }}" />
+                    <button type="submit" class="btn btn-outline-success">Добавить в избранное</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Треков пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Все треки{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Список треков</h2>
+    <div class="row">
+        {% for track in tracks %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ track.track }}</h5>
+                    <p class="card-text">Исполнитель: {{ track.artist }}</p>
+                    <a href="{% url 'get_track_details' track.id %}" class="btn btn-primary">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Треков пока нет.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

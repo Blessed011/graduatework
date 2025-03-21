@@ -59,7 +59,7 @@ ROOT_URLCONF = 'webapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['C:\\Users\\5\\Desktop\\graduate\\musicrecs\\templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

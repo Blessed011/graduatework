@@ -1,0 +1,14 @@
+{% extends 'musicrecs/base.html' %}
+
+{% block title %}Top Tracks{% endblock %}
+
+{% block content %}
+<h2>Top Popular Tracks</h2>
+<ul>
+    {% for track in top_tracks %}
+        <li>
+            <a href="{% url 'track_detail' track.id %}">{{ track.track_name }} by {{ track.artist }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
