@@ -19,6 +19,7 @@
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
             <input type="hidden" name="track_id" value="{{ track.id }}" />
+            <input type="hidden" name="next" value="{{ request.GET.next }}" />
             <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
         </form>
         {% else %}
@@ -27,11 +28,13 @@
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
             <input type="hidden" name="track_id" value="{{ track.id }}" />
+            <input type="hidden" name="next" value="{{ request.GET.next }}" />
             <button type="submit" class="btn btn-outline-success">Добавить в избранное</button>
         </form>
         {% endif %}
     </div>
 </div>
 
-<a href="{% url 'get_tracks' %}" class="btn btn-secondary mt-3">Назад к списку треков</a>
+<!-- Кнопка "Назад" возвращает на предыдущую страницу -->
+<a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary mt-3">Назад</a>
 {% endblock %}

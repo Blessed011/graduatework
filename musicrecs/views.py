@@ -46,29 +46,29 @@ def get_track_details(request, track_id):
     }
     return render(request, "musicrecs/track_details.html", context)
 
+
+
 # Добавление трека в избранное
 def add_to_favorites(request):
     if request.method == "POST":
         user_id = request.POST.get("user_id")
         track_id = request.POST.get("track_id")
+        next_url = request.POST.get("next", "get_tracks")
 
         if not user_id or not track_id:
             return JsonResponse({"error": "user_id и track_id обязательны"}, status=400)
 
-        favorite, created = Favorite.objects.get_or_create(user_id=user_id, track_id=track_id)
+        Favorite.objects.get_or_create(user_id=user_id, track_id=track_id)
 
-        if created:
-            return redirect(request.META.get("HTTP_REFERER", "get_tracks"))
-        else:
-            return redirect(request.META.get("HTTP_REFERER", "get_tracks"))
-
-    return JsonResponse({"error": "Метод не поддерживается"}, status=405)
+        # Возвращаемся обратно на предыдущую страницу
+        return redirect(next_url)
 
 # Удаление трека из избранного
 def remove_from_favorites(request):
     if request.method == "POST":
         user_id = request.POST.get("user_id")
         track_id = request.POST.get("track_id")
+        next_url = request.POST.get("next", "get_tracks")
 
         if not user_id or not track_id:
             return JsonResponse({"error": "user_id и track_id обязательны"}, status=400)
@@ -76,11 +76,12 @@ def remove_from_favorites(request):
         try:
             favorite = Favorite.objects.get(user_id=user_id, track_id=track_id)
             favorite.delete()
-            return redirect(request.META.get("HTTP_REFERER", "get_tracks"))
         except Favorite.DoesNotExist:
-            return redirect(request.META.get("HTTP_REFERER", "get_tracks"))
+            pass
 
-    return JsonResponse({"error": "Метод не поддерживается"}, status=405)
+        # Возвращаемся обратно на предыдущую страницу
+        return redirect(next_url)
+
 
 
 # Получение избранных треков пользователя

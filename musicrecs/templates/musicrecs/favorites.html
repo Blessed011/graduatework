@@ -3,7 +3,7 @@
 {% block title %}Избранное{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Ваши избранные треки</h2>
+<h2 class="mb-4">Избранные треки</h2>
 
 <div class="row">
     {% for track in favorites %}
@@ -12,20 +12,21 @@
             <div class="card-body">
                 <h5 class="card-title">{{ track.track }}</h5>
                 <p class="card-text"><strong>Исполнитель:</strong> {{ track.artist }}</p>
-                <a href="{% url 'get_track_details' track.id %}" class="btn btn-primary">Подробнее</a>
-                
-                <!-- Кнопка "Удалить из избранного" -->
+                <a href="{% url 'get_track_details' track.id %}?next={{ request.get_full_path }}" class="btn btn-primary">Подробнее</a>
+
+                <!-- Удалить из избранного -->
                 <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
                     <input type="hidden" name="track_id" value="{{ track.id }}" />
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}" />
                     <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
                 </form>
             </div>
         </div>
     </div>
     {% empty %}
-    <p>В избранном пока ничего нет.</p>
+    <p>В избранном пока нет треков.</p>
     {% endfor %}
 </div>
 {% endblock %}
