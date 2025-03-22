@@ -38,4 +38,33 @@
     <p>Треков пока нет.</p>
     {% endfor %}
 </div>
+
+<!-- Пагинация -->
+{% if tracks.has_other_pages %}
+<nav aria-label="Навигация по страницам">
+    <ul class="pagination justify-content-center mt-4">
+        {% if tracks.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">Первая</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ tracks.previous_page_number }}">Предыдущая</a>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">Страница {{ tracks.number }} из {{ tracks.paginator.num_pages }}</span>
+        </li>
+
+        {% if tracks.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ tracks.next_page_number }}">Следующая</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ tracks.paginator.num_pages }}">Последняя</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
 {% endblock %}

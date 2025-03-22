@@ -11,7 +11,14 @@ import logging
 
 # Получение списка всех треков
 def get_tracks(request):
-    tracks = Track.objects.order_by("id")
+    tracks_list = Track.objects.order_by("id")
+
+    # Пагинация: 12 треков на странице
+    paginator = Paginator(tracks_list, 24)
+    page_number = request.GET.get("page")
+    tracks = paginator.get_page(page_number)
+
+    # Получаем избранные треки пользователя
     favorite_track_ids = (
         Favorite.objects.filter(user_id=request.session.get("user_id")).values_list("track_id", flat=True)
         if request.session.get("user_id")
@@ -19,7 +26,7 @@ def get_tracks(request):
     )
 
     context = {
-        "tracks": tracks,
+        "tracks": tracks,  # Передаём объект пагинатора
         "favorite_track_ids": list(favorite_track_ids),
     }
     return render(request, "musicrecs/tracks.html", context)
