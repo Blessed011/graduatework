@@ -5,6 +5,33 @@
 {% block content %}
 <h2 class="mb-4">Избранные треки</h2>
 
+<!-- Форма поиска и сортировки -->
+<form method="GET" action="{% url 'get_favorites' request.session.user_id %}" id="filter-form" class="mb-4">
+    <div class="row align-items-center">
+        <!-- Поле поиска (удлинено) -->
+        <div class="col-md-6 mb-2">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Поиск по названию или исполнителю" value="{{ request.GET.q }}">
+                <!-- Кнопка Поиск рядом с полем -->
+                <button type="submit" class="btn btn-primary btn-sm">Поиск</button>
+            </div>
+        </div>
+
+        <!-- Поле сортировки (справа и уменьшено) -->
+        <div class="col-md-3 mb-2 ms-auto text-end">
+            <select name="sort_by" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                <option value="name" {% if request.GET.sort_by == 'name' %}selected{% endif %}>
+                    По алфавиту
+                </option>
+                <option value="popularity" {% if request.GET.sort_by == 'popularity' %}selected{% endif %}>
+                    По популярности
+                </option>
+            </select>
+            <i class="bi bi-caret-down-fill ms-1"></i>
+        </div>
+    </div>
+</form>
+
 <div class="row">
     {% for track in favorites %}
     <div class="col-md-4 mb-3">
@@ -14,13 +41,12 @@
                 <p class="card-text"><strong>Исполнитель:</strong> {{ track.artist }}</p>
                 <a href="{% url 'get_track_details' track.id %}?next={{ request.get_full_path }}" class="btn btn-primary">Подробнее</a>
 
-                <!-- Удалить из избранного -->
                 <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
                     <input type="hidden" name="track_id" value="{{ track.id }}" />
                     <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-                    <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Удалить из избранного</button>
                 </form>
             </div>
         </div>

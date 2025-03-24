@@ -6,19 +6,26 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.hashers import check_password, make_password
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from django.db.models import Q
 import json
 import logging
 
 # Получение списка всех треков
 def get_tracks(request):
-    tracks_list = Track.objects.order_by("id")
+    query = request.GET.get("q", "")
+    sort_by = request.GET.get("sort_by", "name")
 
-    # Пагинация: 12 треков на странице
+    # Фильтрация по названию или исполнителю
+    tracks_list = Track.objects.filter(
+        Q(track__icontains=query) | Q(artist__icontains=query)
+    ).order_by("track" if sort_by == "name" else "-popularity")
+
+    # Пагинация: 24 трека на странице
     paginator = Paginator(tracks_list, 24)
     page_number = request.GET.get("page")
     tracks = paginator.get_page(page_number)
 
-    # Получаем избранные треки пользователя
+    # Получение избранных треков пользователя
     favorite_track_ids = (
         Favorite.objects.filter(user_id=request.session.get("user_id")).values_list("track_id", flat=True)
         if request.session.get("user_id")
@@ -26,7 +33,7 @@ def get_tracks(request):
     )
 
     context = {
-        "tracks": tracks,  # Передаём объект пагинатора
+        "tracks": tracks,
         "favorite_track_ids": list(favorite_track_ids),
     }
     return render(request, "musicrecs/tracks.html", context)
@@ -86,8 +93,24 @@ def remove_from_favorites(request):
 
 # Получение избранных треков пользователя
 def get_favorites(request, user_id):
+    query = request.GET.get("q", "")
+    sort_by = request.GET.get("sort_by", "name")
+
+    # Получение избранных треков с фильтрацией и сортировкой
     favorites = Favorite.objects.filter(user_id=user_id).select_related("track")
-    favorite_tracks = [fav.track for fav in favorites]
+
+    # Фильтрация по названию или исполнителю
+    favorite_tracks = [
+        fav.track
+        for fav in favorites
+        if query.lower() in fav.track.track.lower() or query.lower() in fav.track.artist.lower()
+    ]
+
+    # Сортировка треков
+    if sort_by == "name":
+        favorite_tracks.sort(key=lambda x: x.track.lower())
+    elif sort_by == "popularity":
+        favorite_tracks.sort(key=lambda x: x.popularity, reverse=True)
 
     context = {
         "favorites": favorite_tracks,
