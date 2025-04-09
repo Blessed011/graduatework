@@ -1,4 +1,5 @@
 {% extends 'musicrecs/base.html' %}
+{% load time_filters %}
 
 {% block title %}{{ track.track }} - Подробности{% endblock %}
 
@@ -10,7 +11,7 @@
         <h5 class="card-title"><strong>Исполнитель:</strong> {{ track.artist }}</h5>
         <p class="card-text"><strong>Год:</strong> {{ track.year }}</p>
         <p class="card-text"><strong>Жанр:</strong> {{ track.genre }}</p>
-        <p class="card-text"><strong>Длительность:</strong> {{ track.duration }} мс</p>
+        <p class="card-text"><strong>Длительность:</strong> {{ track.duration|ms_to_mmss }}</p>
         <p class="card-text"><strong>Популярность:</strong> {{ track.popularity }}</p>
         
         {% if request.session.user_id %}
@@ -34,7 +35,7 @@
             </form>
             {% endif %}
         {% endif %}
-        
+
         {% if not request.GET.next or '/recommendations/' not in request.GET.next %}
             <a href="{% url 'get_track_recommendations' track.id %}" class="btn btn-info ms-2">Получить рекомендации</a>
         {% endif %}
