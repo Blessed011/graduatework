@@ -12,7 +12,7 @@
         <p class="card-text"><strong>Жанр:</strong> {{ track.genre }}</p>
         <p class="card-text"><strong>Длительность:</strong> {{ track.duration }} мс</p>
         <p class="card-text"><strong>Популярность:</strong> {{ track.popularity }}</p>
-
+        
         {% if track.id in favorite_track_ids %}
         <!-- Удалить из избранного -->
         <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
@@ -28,12 +28,16 @@
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
             <input type="hidden" name="track_id" value="{{ track.id }}" />
-            <input type="hidden" name="next" value="{{ request.GET.next }}" />
+            <input type="hidden" name="next" value="{{ request.GET.next}}" />
             <button type="submit" class="btn btn-outline-success">Добавить в избранное</button>
         </form>
         {% endif %}
+        {% if not request.GET.next or '/recommendations/' not in request.GET.next %}
+            <a href="{% url 'get_track_recommendations' track.id %}" class="btn btn-info ms-2">Получить рекомендации</a>
+        {% endif %}
     </div>
 </div>
+
 
 <!-- Кнопка "Назад" возвращает на предыдущую страницу -->
 <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary mt-3">Назад</a>

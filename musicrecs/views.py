@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Track, Favorite, User
+from .models import Track, Favorite, User, Recommendation
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.hashers import check_password, make_password
@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 import json
 import logging
+from .recommendations import get_content_based_recommendations, get_collaborative_recommendations, save_recommendations
 
 # Получение списка всех треков
 def get_tracks(request):
@@ -68,7 +69,11 @@ def add_to_favorites(request):
         Favorite.objects.get_or_create(user_id=user_id, track_id=track_id)
 
         # Возвращаемся обратно на предыдущую страницу
-        return redirect(next_url)
+        next_url = request.POST.get('next')
+        if next_url:
+            return redirect(next_url)
+        else:
+            return redirect('get_favorites', user_id=user_id)
 
 # Удаление трека из избранного
 def remove_from_favorites(request):
@@ -175,3 +180,33 @@ logger = logging.getLogger(__name__)
 def logout(request):
     request.session.flush()  # Очистка сессии
     return redirect("login")
+
+
+# Получить рекомендации для конкретного трека
+def get_track_recommendations(request, track_id):
+    recommendations = get_content_based_recommendations(track_id)
+    user_id = request.session.get("user_id")
+
+    if user_id and recommendations:
+        save_recommendations(user_id, recommendations)
+
+    return redirect("show_recommendations")
+
+# Получить рекомендации на основе избранного
+def get_favorites_recommendations(request, user_id):
+    recommendations = get_collaborative_recommendations(user_id)
+
+    if recommendations:
+        save_recommendations(user_id, recommendations)
+
+    return redirect("show_recommendations")
+
+# Показать список рекомендаций
+def show_recommendations(request):
+    user_id = request.session.get("user_id")
+    recommendations = Recommendation.objects.filter(user_id=user_id).select_related("track")
+
+    context = {
+        "recommendations": recommendations,
+    }
+    return render(request, "musicrecs/recommendations.html", context)

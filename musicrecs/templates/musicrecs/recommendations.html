@@ -1,14 +1,24 @@
 {% extends 'musicrecs/base.html' %}
 
-{% block title %}Recommendations{% endblock %}
+{% block title %}Рекомендации{% endblock %}
 
 {% block content %}
-<h2>Recommendations for "{{ track_name }}"</h2>
-<ul>
-    {% for track in recommendations %}
-        <li>{{ track }}</li>
+<h2 class="mb-4">Рекомендации</h2>
+
+<div class="row">
+    {% for rec in recommendations %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ rec.track.track }}</h5>
+                <p class="card-text"><strong>Исполнитель:</strong> {{ rec.track.artist }}</p>
+                <p class="card-text"><strong>Причина:</strong> {{ rec.reason }}</p>
+                <a href="{% url 'get_track_details' rec.track.id %}?next={{ request.path }}" class="btn btn-primary">Подробнее</a>
+            </div>
+        </div>
+    </div>
     {% empty %}
-        <p>No recommendations available.</p>
+    <p>Пока нет рекомендаций.</p>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}
