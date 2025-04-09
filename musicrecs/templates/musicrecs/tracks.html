@@ -40,23 +40,25 @@
                 <h5 class="card-title">{{ track.track }}</h5>
                 <p class="card-text"><strong>Исполнитель:</strong> {{ track.artist }}</p>
                 <a href="{% url 'get_track_details' track.id %}?next={{ request.get_full_path }}" class="btn btn-primary">Подробнее</a>
-
-                {% if track.id in favorite_track_ids %}
-                <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
-                    <input type="hidden" name="track_id" value="{{ track.id }}" />
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-                    <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
-                </form>
-                {% else %}
-                <form action="{% url 'add_to_favorites' %}" method="POST" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
-                    <input type="hidden" name="track_id" value="{{ track.id }}" />
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-                    <button type="submit" class="btn btn-outline-success">Добавить в избранное</button>
-                </form>
+                
+                {% if request.session.user_id %}
+                    {% if track.id in favorite_track_ids %}
+                    <form action="{% url 'remove_from_favorites' %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
+                        <input type="hidden" name="track_id" value="{{ track.id }}" />
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+                        <button type="submit" class="btn btn-outline-danger">Удалить из избранного</button>
+                    </form>
+                    {% else %}
+                    <form action="{% url 'add_to_favorites' %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ request.session.user_id }}" />
+                        <input type="hidden" name="track_id" value="{{ track.id }}" />
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+                        <button type="submit" class="btn btn-outline-success">Добавить в избранное</button>
+                    </form>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
