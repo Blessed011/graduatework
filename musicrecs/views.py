@@ -62,37 +62,27 @@ def add_to_favorites(request):
     if request.method == "POST":
         user_id = request.POST.get("user_id")
         track_id = request.POST.get("track_id")
-        next_url = request.POST.get("next", "get_tracks")
+        next_url = request.POST.get("next", "/")
 
         if not user_id or not track_id:
             return JsonResponse({"error": "user_id и track_id обязательны"}, status=400)
 
         Favorite.objects.get_or_create(user_id=user_id, track_id=track_id)
 
-        # Возвращаемся обратно на предыдущую страницу
-        next_url = request.POST.get('next')
-        if next_url:
-            return redirect(next_url)
-        else:
-            return redirect('get_favorites', user_id=user_id)
+        return redirect(next_url)
 
 # Удаление трека из избранного
 def remove_from_favorites(request):
     if request.method == "POST":
         user_id = request.POST.get("user_id")
         track_id = request.POST.get("track_id")
-        next_url = request.POST.get("next", "get_tracks")
+        next_url = request.POST.get("next", "/")
 
         if not user_id or not track_id:
             return JsonResponse({"error": "user_id и track_id обязательны"}, status=400)
 
-        try:
-            favorite = Favorite.objects.get(user_id=user_id, track_id=track_id)
-            favorite.delete()
-        except Favorite.DoesNotExist:
-            pass
+        Favorite.objects.filter(user_id=user_id, track_id=track_id).delete()
 
-        # Возвращаемся обратно на предыдущую страницу
         return redirect(next_url)
 
 
