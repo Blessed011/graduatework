@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 import json
 import logging
+import re
 from .recommendations import get_content_based_recommendations, get_collaborative_recommendations, save_recommendations
 
 # Получение списка всех треков
@@ -131,6 +132,9 @@ def register(request):
 
         if not login or not password:
             return render(request, "musicrecs/register.html", {"error": "Логин и пароль обязательны"})
+        
+        if not re.match(r'^[a-zA-Z0-9_]+$', login):
+            return render(request, "musicrecs/register.html", {"error": "Логин может содержать только латинские буквы, цифры и подчёркивания"})
 
         if User.objects.filter(login=login).exists():
             return render(request, "musicrecs/register.html", {"error": "Такой пользователь уже существует"})
@@ -156,6 +160,9 @@ def login(request):
 
         if not login_value or not password:
             return render(request, "musicrecs/login.html", {"error": "Логин и пароль обязательны"})
+        
+        if not re.match(r'^[a-zA-Z0-9_]+$', login_value):
+            return render(request, "musicrecs/login.html", {"error": "Логин может содержать только латинские буквы, цифры и подчёркивания"})
 
         try:
             user = User.objects.get(login=login_value)
