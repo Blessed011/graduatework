@@ -5,20 +5,28 @@
 {% block content %}
 <h2 class="mb-4">Рекомендации</h2>
 
+{% if recommendations %}
 <div class="row">
     {% for rec in recommendations %}
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            {% comment %} Добавь изображение, если есть поле image_url {% endcomment %}
+            {# <img src="{{ rec.track.image_url }}" class="card-img-top" alt="Обложка трека"> #}
+
+            <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ rec.track.track }}</h5>
-                <p class="card-text"><strong>Исполнитель:</strong> {{ rec.track.artist }}</p>
-                <p class="card-text"><strong>Причина:</strong> {{ rec.reason }}</p>
-                <a href="{% url 'get_track_details' rec.track.id %}?next={{ request.path }}" class="btn btn-primary">Подробнее</a>
+                <p class="card-text mb-1"><strong>Исполнитель:</strong> {{ rec.track.artist }}</p>
+                <p class="card-text text-muted mb-3">{{ rec.reason }}</p>
+                <a href="{% url 'get_track_details' rec.track.id %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary mt-auto">Подробнее</a>
             </div>
         </div>
     </div>
-    {% empty %}
-    <p>Пока нет рекомендаций.</p>
     {% endfor %}
 </div>
+{% else %}
+<div class="alert alert-info text-center" role="alert">
+    Пока нет рекомендаций. Попробуйте выбрать трек или добавьте треки в избранное.
+</div>
+{% endif %}
+
 {% endblock %}

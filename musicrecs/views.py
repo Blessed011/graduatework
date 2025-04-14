@@ -181,26 +181,36 @@ def logout(request):
 
 # Получить рекомендации для конкретного трека
 def get_track_recommendations(request, track_id):
-    recommendations = get_content_based_recommendations(track_id)
     user_id = request.session.get("user_id")
+    if not user_id:
+        return redirect("login")
 
-    if user_id and recommendations:
-        save_recommendations(user_id, recommendations)
+    recommendations = get_content_based_recommendations(track_id)
+
+    if recommendations:
+        save_recommendations(user_id, recommendations, source="track", track_id=track_id)
 
     return redirect("show_recommendations")
 
 # Получить рекомендации на основе избранного
 def get_favorites_recommendations(request, user_id):
+    session_user_id = request.session.get("user_id")
+    if not session_user_id or int(user_id) != session_user_id:
+        return redirect("login")
+
     recommendations = get_collaborative_recommendations(user_id)
 
     if recommendations:
-        save_recommendations(user_id, recommendations)
+        save_recommendations(user_id, recommendations, source="favorites")
 
     return redirect("show_recommendations")
 
 # Показать список рекомендаций
 def show_recommendations(request):
     user_id = request.session.get("user_id")
+    if not user_id:
+        return redirect("login")
+
     recommendations = Recommendation.objects.filter(user_id=user_id).select_related("track")
 
     context = {
