@@ -21,7 +21,7 @@
         <div class="col-md-3 mb-2 ms-auto text-end">
             <select name="sort_by" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
                 <option value="name" {% if request.GET.sort_by == 'name' %}selected{% endif %}>
-                    По алфавиту
+                    По названию
                 </option>
                 <option value="popularity" {% if request.GET.sort_by == 'popularity' %}selected{% endif %}>
                     По популярности
