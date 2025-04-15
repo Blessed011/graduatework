@@ -179,18 +179,31 @@ def logout(request):
     return redirect("login")
 
 
-# Получить рекомендации для конкретного трека
+# # Получить рекомендации для конкретного трека
 def get_track_recommendations(request, track_id):
+    track = get_object_or_404(Track, id=track_id)
+    recommendations_raw = get_content_based_recommendations(track_id)
     user_id = request.session.get("user_id")
-    if not user_id:
-        return redirect("login")
 
-    recommendations = get_content_based_recommendations(track_id)
+    if user_id:
+        save_recommendations(user_id, recommendations_raw, source="track", track_id=track_id)
+        return redirect("show_recommendations")
+    else:
+        # Пользователь не авторизован — просто отобразим рекомендации без сохранения
+        recommended_tracks = []
+        for rec in recommendations_raw:
+            rec_track = get_object_or_404(Track, id=rec["track_id"])
+            recommended_tracks.append({
+                "track": rec_track,
+                "reason": rec["reason"]
+            })
 
-    if recommendations:
-        save_recommendations(user_id, recommendations, source="track", track_id=track_id)
+        context = {
+            "recommendations": recommended_tracks,
+            "based_on_track": track
+        }
+        return render(request, "musicrecs/recommendations.html", context)
 
-    return redirect("show_recommendations")
 
 # Получить рекомендации на основе избранного
 def get_favorites_recommendations(request, user_id):
@@ -198,7 +211,7 @@ def get_favorites_recommendations(request, user_id):
     if not session_user_id or int(user_id) != session_user_id:
         return redirect("login")
 
-    recommendations = get_collaborative_recommendations(user_id)
+    recommendations = get_collaborative_recommendations(user_id, top_n=9)
 
     if recommendations:
         save_recommendations(user_id, recommendations, source="favorites")

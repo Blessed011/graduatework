@@ -36,13 +36,15 @@
             {% endif %}
         {% endif %}
 
-        {% if not request.GET.next or '/recommendations/' not in request.GET.next %}
-            <a href="{% url 'get_track_recommendations' track.id %}" class="btn btn-info ms-2">Получить рекомендации</a>
-        {% endif %}
+        <div class="d-inline">
+            <form method="post" action="{% url 'get_track_recommendations' track.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Получить рекомендации</button>
+            </form>
+        </div>
     </div>
 </div>
 
 
-<!-- Кнопка "Назад" возвращает на предыдущую страницу -->
 <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary mt-3">Назад</a>
 {% endblock %}

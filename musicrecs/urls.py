@@ -10,7 +10,7 @@ urlpatterns = [
     path("register/", register, name="register"),
     path("login/", login, name="login"),
     path("logout/", logout, name="logout"),
-    path("tracks/<int:track_id>/recommend/", get_track_recommendations, name="get_track_recommendations"),
+    path("recommend/track/<int:track_id>/", get_track_recommendations, name="get_track_recommendations"),
     path("favorites/<int:user_id>/recommend/", get_favorites_recommendations, name="get_favorites_recommendations"),
     path("recommendations/", show_recommendations, name="show_recommendations"),
 ]

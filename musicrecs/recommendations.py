@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 from .models import Track, Favorite, Recommendation
 
-# Путь к файлу с моделью (нормализованные признаки)
+# Путь к файлу с моделью
 MODEL_PATH = "C:\\Users\\5\Desktop\\graduate\\musicrecs\\rec_model\\hybrid_model.pkl"
 
 # Признаки, используемые в модели
@@ -40,7 +40,7 @@ def load_model_features():
     return model["df"]
 
 # Content-based рекомендации
-def get_content_based_recommendations(track_id, top_n=5):
+def get_content_based_recommendations(track_id, top_n=9):
     df = load_model_features()
 
     selected_track = df[df["id"] == track_id]
@@ -63,7 +63,7 @@ def get_content_based_recommendations(track_id, top_n=5):
     return recommendations
 
 # Collaborative рекомендации
-def get_collaborative_recommendations(user_id, top_n=5):
+def get_collaborative_recommendations(user_id, top_n=9):
     favorites_ids = Favorite.objects.filter(user_id=user_id).values_list("track_id", flat=True)
     if not favorites_ids:
         return []
