@@ -40,7 +40,7 @@ def load_model_features():
     return model["df"]
 
 # Content-based рекомендации
-def get_content_based_recommendations(track_id, top_n=9):
+def get_content_based_recommendations(track_id, top_n=15):
     df = load_model_features()
 
     selected_track = df[df["id"] == track_id]
@@ -57,13 +57,14 @@ def get_content_based_recommendations(track_id, top_n=9):
         reason = generate_reason(selected_track.iloc[0], row)
         recommendations.append({
             "track_id": row["id"],
-            "reason": reason
+            "reason": reason,
+            "similarity": row["similarity"]
         })
 
     return recommendations
 
 # Collaborative рекомендации
-def get_collaborative_recommendations(user_id, top_n=9):
+def get_collaborative_recommendations(user_id, top_n=15):
     favorites_ids = Favorite.objects.filter(user_id=user_id).values_list("track_id", flat=True)
     if not favorites_ids:
         return []
@@ -85,7 +86,8 @@ def get_collaborative_recommendations(user_id, top_n=9):
         reason = generate_reason_from_user_profile(user_profile_avg, row)
         recommendations.append({
             "track_id": row["id"],
-            "reason": reason
+            "reason": reason,
+            "similarity": row["similarity"]
         })
 
     return recommendations

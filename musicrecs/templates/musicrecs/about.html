@@ -1,0 +1,39 @@
+{% extends 'musicrecs/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title text-center">
+                Добро пожаловать{% if request.session.user_name %}, {{ request.session.user_name }}{% endif %}
+            </h1>
+
+            <h5 class="card-text mt-4">
+                <strong>Music Recs</strong> — это рекомендательная система для получения персонализированных рекомендаций музыкальных композиций, созданная в рамках выпускной квалификационной работы студентом 4-го курса кафедры ИУ5 МГТУ им. Баумана Саргсяном Александром.
+            </h5>
+
+            <h3 class="mt-4">Основные функции:</h3>
+            <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item">
+                    Нажмите на <a href="{% url 'get_tracks' %}">Music Recs</a> на навигационной панели, чтобы перейти на страницу со всеми треками. Там можно посмотреть подробную информацию о каждом треке, добавить его в  {% if request.session.user_id %} <a href="{% url 'get_favorites' user_id=request.session.user_id %}">Избранное</a> {% else %} избранное (если авторизованы) {% endif %} и получить рекомендации. Для удобного нахождения трека или исполнителя введите название в поисковую строку. Также можете отсоритровать список треков по названию или популярности, выбрав соответствующий способ сортировки во всплывающем списке в правой верхней части экрана.
+                </li>
+                {% if request.session.user_id %}
+                    <li class="list-group-item">
+                        Перейдите в <a href="{% url 'get_favorites' user_id=request.session.user_id %}">Избранное</a>, чтобы увидеть список добавленных вами треков.
+                    </li>
+                    <li class="list-group-item">
+                        Получите персональные рекомендации на основе ваших любимых треков прямо из раздела <a href="{% url 'get_favorites' user_id=request.session.user_id %}">Избранное</a>.
+                    </li>
+                    <li class="list-group-item">
+                        Самое время испытать систему!
+                    </li>
+                {% else %}
+                    <li class="list-group-item">
+                        Зарегистрируйтесь или войдите, чтобы добавлять треки в избранное и получать персональные рекомендации.
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

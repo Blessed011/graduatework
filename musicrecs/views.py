@@ -135,8 +135,9 @@ def register(request):
         # Автоматически логиним пользователя после регистрации
         request.session["user_id"] = user.id
         request.session["user_login"] = user.login
+        request.session["user_name"] = user.name
 
-        return redirect("get_tracks")
+        return redirect("about")
 
     return render(request, "musicrecs/register.html")
 
@@ -165,8 +166,9 @@ def login(request):
         # Сохранение данных в сессию
         request.session["user_id"] = user.id
         request.session["user_login"] = user.login
+        request.session['user_name'] = user.name
 
-        return redirect("get_tracks")
+        return redirect("about")
 
     return render(request, "musicrecs/login.html")
         
@@ -183,6 +185,7 @@ def logout(request):
 def get_track_recommendations(request, track_id):
     track = get_object_or_404(Track, id=track_id)
     recommendations_raw = get_content_based_recommendations(track_id)
+    recommendations_raw.sort(key=lambda x: x['similarity'], reverse=True)
     user_id = request.session.get("user_id")
 
     if user_id:
@@ -211,7 +214,8 @@ def get_favorites_recommendations(request, user_id):
     if not session_user_id or int(user_id) != session_user_id:
         return redirect("login")
 
-    recommendations = get_collaborative_recommendations(user_id, top_n=9)
+    recommendations = get_collaborative_recommendations(user_id, top_n=15)
+    recommendations.sort(key=lambda x: x['similarity'], reverse=True)
 
     if recommendations:
         save_recommendations(user_id, recommendations, source="favorites")
@@ -230,3 +234,6 @@ def show_recommendations(request):
         "recommendations": recommendations,
     }
     return render(request, "musicrecs/recommendations.html", context)
+
+def about(request):
+    return render(request, "musicrecs/about.html")
