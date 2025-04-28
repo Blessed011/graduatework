@@ -228,12 +228,22 @@ def show_recommendations(request):
     if not user_id:
         return redirect("login")
 
-    recommendations = Recommendation.objects.filter(user_id=user_id).select_related("track")
+    recommendations_raw = Recommendation.objects.filter(user_id=user_id).select_related("track")
+
+    # Подготовим список в нужном формате
+    recommendations = []
+    for rec in recommendations_raw:
+        recommendations.append({
+            "track": rec.track,
+            "reason": rec.reason,
+        })
 
     context = {
         "recommendations": recommendations,
     }
     return render(request, "musicrecs/recommendations.html", context)
+
+
 
 def about(request):
     return render(request, "musicrecs/about.html")

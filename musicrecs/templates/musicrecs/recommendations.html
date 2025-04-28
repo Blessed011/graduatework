@@ -5,22 +5,24 @@
 {% block content %}
 <h2 class="mb-4">Рекомендации</h2>
 
-{% if based_on_track %}
-<p class="text-muted">На основе трека <strong>{{ based_on_track.track }}</strong> от {{ based_on_track.artist }}</p>
-{% endif %}
-
 {% if recommendations %}
 <div class="row">
     {% for rec in recommendations %}
     <div class="col-md-4 mb-4">
         <div class="card h-100 shadow-sm">
-            {# <img src="{{ rec.track.image_url }}" class="card-img-top" alt="Обложка трека"> #}
-
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ rec.track.track }}</h5>
-                <p class="card-text mb-1"><strong>Исполнитель:</strong> {{ rec.track.artist }}</p>
-                <p class="card-text text-muted mb-3">{{ rec.reason }}</p>
-                <a href="{% url 'get_track_details' rec.track.id %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary mt-auto">Подробнее</a>
+                {% if rec.track %}
+                    <h5 class="card-title">
+                            {{ rec.track.track }}
+                    </h5>
+                    <p class="card-text mb-1"><strong>Исполнитель:</strong> {{ rec.track.artist }}</p>
+                    {% if rec.reason %}
+                        <p class="card-text text-muted mb-3">{{ rec.reason }}</p>
+                    {% endif %}
+                    <a href="{% url 'get_track_details' rec.track.id %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary mt-auto">Подробнее</a>
+                {% else %}
+                    <h5 class="card-title">Трек не найден</h5>
+                {% endif %}
             </div>
         </div>
     </div>
