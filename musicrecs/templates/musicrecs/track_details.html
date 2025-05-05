@@ -14,8 +14,8 @@
         <p class="card-text"><strong>Длительность:</strong> {{ track.duration|ms_to_mmss }}</p>
         <p class="card-text"><strong>Популярность:</strong> {{ track.popularity }}</p>
         <p class="card-text">
-            <a href="https://www.youtube.com/results?search_query={{ track.artist|urlencode }}+{{ track.track|urlencode }}" target="_blank" class="btn btn-outline-primary">
-                Послушать на YouTube
+            <a href="https://zvuk.com/search?query={{ track.artist|urlencode }}+{{ track.track|urlencode }}" target="_blank" class="btn btn-outline-primary">
+                Послушать на Zvuk.com
             </a>
         </p>
         {% if request.session.user_id %}

@@ -11,6 +11,14 @@ MODEL_PATH = "C:\\Users\\5\Desktop\\graduate\\musicrecs\\rec_model\\hybrid_model
 # Признаки, используемые в модели
 FEATURE_COLS = ["danceability", "energy", "valence", "tempo", "popularity"]
 
+FEATURE_NAME_MAP = {
+    "danceability": "танцевальность",
+    "energy": "энергичность",
+    "valence": "валентность",
+    "tempo": "темп",
+    "popularity": "популярность"
+}
+
 # Загрузка треков из базы данных
 def load_tracks_data():
     tracks = Track.objects.all().values()
@@ -98,12 +106,13 @@ def generate_reason(base_track, similar_track):
     for col in FEATURE_COLS:
         diff = abs(base_track[col] - similar_track[col])
         if diff < 0.1:
-            reasons.append(col)
+            reasons.append(FEATURE_NAME_MAP.get(col, col))
     if reasons:
         reason_str = ", ".join(reasons)
         return f"Похож на трек '{base_track['track']}' по признакам: {reason_str}."
     else:
         return f"Похож на трек '{base_track['track']}' по общим характеристикам."
+
 
 # Генерация причины на основе схожести со средним профилем пользователя
 def generate_reason_from_user_profile(profile_avg, track_row):
@@ -111,7 +120,7 @@ def generate_reason_from_user_profile(profile_avg, track_row):
     for i, col in enumerate(FEATURE_COLS):
         diff = abs(profile_avg[i] - track_row[col])
         if diff < 0.1:
-            reasons.append(col)
+            reasons.append(FEATURE_NAME_MAP.get(col, col))
     if reasons:
         reason_str = ", ".join(reasons)
         return f"Похож на ваши избранные треки по признакам: {reason_str}."
