@@ -9,14 +9,16 @@ from .models import Track, Favorite, Recommendation
 MODEL_PATH = "C:\\Users\\5\Desktop\\graduate\\musicrecs\\rec_model\\hybrid_model.pkl"
 
 # Признаки, используемые в модели
-FEATURE_COLS = ["danceability", "energy", "valence", "tempo", "popularity"]
+FEATURE_COLS = ["danceability", "energy", "valence", "tempo", "popularity", "instrumentalness", "acousticness"]
 
 FEATURE_NAME_MAP = {
     "danceability": "танцевальность",
     "energy": "энергичность",
     "valence": "валентность",
     "tempo": "темп",
-    "popularity": "популярность"
+    "popularity": "популярность",
+    "instrumentalness": "инструментальность",
+    "acousticness": "акустичность"
 }
 
 # Загрузка треков из базы данных
@@ -136,3 +138,21 @@ def save_recommendations(user_id, recommendations, source="track", track_id=None
             track_id=rec["track_id"],
             reason=rec["reason"]
         )
+
+def print_similarity_for_track(track_id):
+    df = load_model_features()
+    track_row = df[df["id"] == track_id]
+    if track_row.empty:
+        print("Трек не найден.")
+        return
+
+    track_name = track_row.iloc[0]["track"]
+    similarities = cosine_similarity(df["features"].tolist(), track_row["features"].tolist()).flatten()
+
+    sim_df = pd.DataFrame({
+        "track": df["track"],
+        "similarity": similarities
+    }).sort_values(by="similarity", ascending=False)
+
+    print(f"\nСходства треков с треком '{track_name}':")
+    print(sim_df.head(16).round(4))
