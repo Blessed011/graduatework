@@ -17,17 +17,14 @@ def get_tracks(request):
     query = request.GET.get("q", "")
     sort_by = request.GET.get("sort_by", "name")
 
-    # Фильтрация по названию или исполнителю
     tracks_list = Track.objects.filter(
         Q(track__icontains=query) | Q(artist__icontains=query)
     ).order_by("track" if sort_by == "name" else "-popularity")
 
-    # Пагинация: 24 трека на странице
     paginator = Paginator(tracks_list, 24)
     page_number = request.GET.get("page")
     tracks = paginator.get_page(page_number)
 
-    # Получение избранных треков пользователя
     favorite_track_ids = (
         Favorite.objects.filter(user_id=request.session.get("user_id")).values_list("track_id", flat=True)
         if request.session.get("user_id")
@@ -126,6 +123,9 @@ def register(request):
         if not re.match(r'^[a-zA-Z0-9_]+$', login):
             return render(request, "musicrecs/register.html", {"error": "Логин может содержать только латинские буквы, цифры и подчёркивания"})
 
+        if len(password) < 2 or len(password) > 20:
+            return render(request, "musicrecs/register.html", {"error": "Пароль должен быть от 2 до 20 символов"})
+        
         if User.objects.filter(login=login).exists():
             return render(request, "musicrecs/register.html", {"error": "Такой пользователь уже существует"})
 
@@ -192,7 +192,6 @@ def get_track_recommendations(request, track_id):
         save_recommendations(user_id, recommendations_raw, source="track", track_id=track_id)
         return redirect("show_recommendations")
     else:
-        # Пользователь не авторизован — просто отобразим рекомендации без сохранения
         recommended_tracks = []
         for rec in recommendations_raw:
             rec_track = get_object_or_404(Track, id=rec["track_id"])
@@ -230,7 +229,6 @@ def show_recommendations(request):
 
     recommendations_raw = Recommendation.objects.filter(user_id=user_id).select_related("track")
 
-    # Подготовим список в нужном формате
     recommendations = []
     for rec in recommendations_raw:
         recommendations.append({

@@ -156,3 +156,18 @@ def print_similarity_for_track(track_id):
 
     print(f"\nСходства треков с треком '{track_name}':")
     print(sim_df.head(16).round(4))
+
+
+
+    # Для матрицы косинусного сходства:
+
+    # from musicrecs import recommendations
+    # recommendations.print_similarity_for_track(track_id=1)
+
+
+
+    # Для изменения состава ключевых характеристик:
+
+    # from musicrecs.recommendations import load_tracks_data, extract_and_save_features
+    # df = load_tracks_data()
+    # extract_and_save_features(df)

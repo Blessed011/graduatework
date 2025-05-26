@@ -12,6 +12,12 @@
         <p class="card-text"><strong>Год:</strong> {{ track.year }}</p>
         <p class="card-text"><strong>Жанр:</strong> {{ track.genre }}</p>
         <p class="card-text"><strong>Длительность:</strong> {{ track.duration|ms_to_mmss }}</p>
+        <p class="card-text"><strong>Темп:</strong> {{ track.tempo }}</p>
+        <p class="card-text"><strong>Энергичность:</strong> {{ track.energy }}</p>
+        <p class="card-text"><strong>Валентность:</strong> {{ track.valence }}</p>
+        <p class="card-text"><strong>Танцевальность:</strong> {{ track.danceability }}</p>
+        <p class="card-text"><strong>Акустичность:</strong> {{ track.acousticness }}</p>
+        <p class="card-text"><strong>Инструментальность:</strong> {{ track.instrumentalness }}</p>
         <p class="card-text"><strong>Популярность:</strong> {{ track.popularity }}</p>
         <p class="card-text">
             <a href="https://zvuk.com/search?query={{ track.artist|urlencode }}+{{ track.track|urlencode }}" target="_blank" class="btn btn-outline-primary">
