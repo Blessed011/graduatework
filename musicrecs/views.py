@@ -12,6 +12,11 @@ import logging
 import re
 from .recommendations import get_content_based_recommendations, get_collaborative_recommendations, save_recommendations
 
+from .forms import TrackRequestForm
+from django.conf import settings
+from django.core.mail import EmailMessage
+
+
 # Получение списка всех треков
 def get_tracks(request):
     query = request.GET.get("q", "")
@@ -245,3 +250,30 @@ def show_recommendations(request):
 
 def about(request):
     return render(request, "musicrecs/about.html")
+
+def request_track_view(request):
+    if request.method == 'POST':
+        form = TrackRequestForm(request.POST, request.FILES)
+        if form.is_valid():
+            subject = "Запрос на добавление нового трека"
+            message = (
+                f"Название трека: {form.cleaned_data['track_name']}\n"
+                f"Исполнитель: {form.cleaned_data['artist']}\n"
+                f"Жанр: {form.cleaned_data['genre'] or 'не указан'}"
+            )
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [settings.ADMIN_EMAIL]
+
+            email = EmailMessage(subject, message, from_email, recipient_list)
+
+            # Если файл прикреплён — добавить как вложение
+            mp3_file = form.cleaned_data.get('mp3_file')
+            if mp3_file:
+                email.attach(mp3_file.name, mp3_file.read(), mp3_file.content_type)
+
+            email.send()
+
+            return render(request, 'musicrecs/track_request_sent.html')
+    else:
+        form = TrackRequestForm()
+    return render(request, 'musicrecs/request_track.html', {'form': form})

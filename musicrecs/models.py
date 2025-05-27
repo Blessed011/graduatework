@@ -39,6 +39,7 @@ class User(models.Model):
         return self.login
 
 class Track(models.Model):
+    id = models.AutoField(primary_key=True)
     track = models.TextField()
     artist = models.TextField()
     year = models.IntegerField()
@@ -59,7 +60,7 @@ class Track(models.Model):
     genre = models.TextField()
 
     class Meta:
-        managed = False  
+        managed = True  
         db_table = 'tracks'
 
 class Favorite(models.Model):

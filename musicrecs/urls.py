@@ -14,4 +14,5 @@ urlpatterns = [
     path("favorites/<int:user_id>/recommend/", get_favorites_recommendations, name="get_favorites_recommendations"),
     path("recommendations/", show_recommendations, name="show_recommendations"),
     path('about/', about, name='about'),
+    path('request/', request_track_view, name='request_track'),
 ]

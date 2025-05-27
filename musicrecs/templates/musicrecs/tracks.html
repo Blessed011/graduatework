@@ -17,6 +17,14 @@
             </div>
         </div>
 
+        <div class="col-md-2 mb-2">
+            <div class="input-group">
+                {% if request.session.user_id %}
+                    <a href="{% url 'request_track' %}" class="btn btn-primary">Запросить новый трек</a>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Поле сортировки (справа и уменьшено) -->
         <div class="col-md-3 mb-2 ms-auto text-end">
             <select name="sort_by" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
