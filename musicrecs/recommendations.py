@@ -9,7 +9,7 @@ from .models import Track, Favorite, Recommendation
 MODEL_PATH = "C:\\Users\\5\Desktop\\graduate\\musicrecs\\rec_model\\hybrid_model.pkl"
 
 # Признаки, используемые в модели
-FEATURE_COLS = ["danceability", "energy", "valence", "tempo", "popularity", "instrumentalness", "acousticness"]
+FEATURE_COLS = ["danceability", "energy", "valence", "tempo", "popularity", "key", "mode"]
 
 FEATURE_NAME_MAP = {
     "danceability": "танцевальность",
@@ -17,8 +17,8 @@ FEATURE_NAME_MAP = {
     "valence": "валентность",
     "tempo": "темп",
     "popularity": "популярность",
-    "instrumentalness": "инструментальность",
-    "acousticness": "акустичность"
+    "key": 'тональность',
+    "mode": 'модальность'
 }
 
 # Загрузка треков из базы данных

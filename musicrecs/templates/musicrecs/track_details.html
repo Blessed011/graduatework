@@ -16,8 +16,8 @@
         <p class="card-text"><strong>Энергичность:</strong> {{ track.energy }}</p>
         <p class="card-text"><strong>Валентность:</strong> {{ track.valence }}</p>
         <p class="card-text"><strong>Танцевальность:</strong> {{ track.danceability }}</p>
-        <p class="card-text"><strong>Акустичность:</strong> {{ track.acousticness }}</p>
-        <p class="card-text"><strong>Инструментальность:</strong> {{ track.instrumentalness }}</p>
+        <p class="card-text"><strong>Тональность:</strong> {{ track.key }}</p>
+        <p class="card-text"><strong>Модальность:</strong> {% if track.mode == 1 %}мажор{% else %}минор{% endif %}</p>
         <p class="card-text"><strong>Популярность:</strong> {{ track.popularity }}</p>
         <p class="card-text">
             <a href="https://zvuk.com/search?query={{ track.artist|urlencode }}+{{ track.track|urlencode }}" target="_blank" class="btn btn-outline-primary">
